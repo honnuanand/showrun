@@ -5,3 +5,4 @@ dist/
 build/
 *.cast
 .venv/
+!docs/casts/*.cast
