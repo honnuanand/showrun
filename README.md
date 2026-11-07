@@ -15,6 +15,8 @@ It's made for anyone who shows a command line to other people: conference talks,
 and especially **how-tos for CLI tools**. Write the steps once, rehearse them in CI, present
 them live, and publish the same file as a replay and a Markdown runbook.
 
+**Website and live replays: [showrun.clues.apps.clue2.app](https://showrun.clues.apps.clue2.app)**
+
 ![showrun presenting a short git how-to](https://raw.githubusercontent.com/honnuanand/showrun/main/docs/media/git-undo.gif)
 
 ```bash
@@ -167,7 +169,14 @@ pip install 'showrun-cli[mcp]'                 # needs Python 3.10+
 claude mcp add showrun -- showrun mcp          # Claude Code
 ```
 
-For other clients, add it to the client's MCP config:
+There's also a hosted, read-only server at `https://showrun.clues.apps.clue2.app/mcp`. It can explain the format, validate
+and export demos, and never runs commands. Use it when you don't want to install anything:
+
+```bash
+claude mcp add --transport http showrun https://showrun.clues.apps.clue2.app/mcp
+```
+
+For other clients, add the local server to the client's MCP config:
 
 ```json
 { "mcpServers": { "showrun": { "command": "showrun", "args": ["mcp"] } } }

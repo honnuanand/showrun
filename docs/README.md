@@ -2,7 +2,7 @@
 
 showrun turns a YAML list of shell steps into a terminal presentation you drive with
 **Enter**. This guide walks through the whole workflow: write, rehearse, present, publish.
-The [project README](../README.md) has the quick reference.
+The [project README](../README.md) has the quick reference, and the [website](https://showrun.clues.apps.clue2.app) plays the sample replays in your browser.
 
 ![A git how-to presented with showrun](media/git-undo.gif)
 
@@ -171,6 +171,13 @@ claude mcp add showrun -- showrun mcp       # Claude Code
 
 ```json
 { "mcpServers": { "showrun": { "command": "showrun", "args": ["mcp"] } } }
+```
+
+A hosted, read-only server (format, validate and export only, never runs commands) is at
+`https://showrun.clues.apps.clue2.app/mcp`:
+
+```bash
+claude mcp add --transport http showrun https://showrun.clues.apps.clue2.app/mcp
 ```
 
 Tools: `demo_format`, `starter_demo`, `validate_demo`, `write_demo`, `check_demo`,

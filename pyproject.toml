@@ -38,8 +38,8 @@ dev = ["pytest>=7", "build", "twine"]
 mcp = ["mcp>=1.2; python_version >= '3.10'"]
 
 [project.urls]
-Homepage = "https://github.com/honnuanand/showrun"
-Source = "https://github.com/honnuanand/showrun"
+Homepage = "https://showrun.clues.apps.clue2.app"
+Repository = "https://github.com/honnuanand/showrun"
 Issues = "https://github.com/honnuanand/showrun/issues"
 Documentation = "https://github.com/honnuanand/showrun/tree/main/docs"
 
