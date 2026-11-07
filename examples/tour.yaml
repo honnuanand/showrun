@@ -45,6 +45,7 @@ steps:
     run: python3 -m http.server {{port}} --bind 127.0.0.1
     background: true
     wait_for: curl -sf http://127.0.0.1:{{port}}/ -o /dev/null
+    wait_timeout: 90        # a cold python3 can take ~30s to start on CI macOS runners
 
   - run: curl -s http://127.0.0.1:{{port}}/ | grep -m1 -o 'app.txt'
     expect_output: app.txt
