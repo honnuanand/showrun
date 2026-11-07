@@ -192,3 +192,35 @@ def test_fallback_to_recording():
     d = demo("steps:\n  - run: exit-with-error-xyz\n    recorded_output: recorded ok\n")
     out, p, fails = play(d, fallback=True)
     assert "recorded run" in out and "recorded ok" in out and fails == 0
+
+
+# --------------------------------------------------------------- render
+def test_render_cast_headless(tmp_path):
+    from showrun.render import render_cast
+
+    out = tmp_path / "r.cast"
+    d = demo("title: t\nsettings: {typing_speed: 0}\nsteps:\n  - echo rendered-ok\n  - run: date\n    execute: false\n    output: canned-day\n")
+    r = render_cast(d, str(out), delay=0, width=80, height=20)
+    assert r.failures == 0 and r.steps == 2
+    lines = out.read_text().splitlines()
+    assert json.loads(lines[0])["width"] == 80
+    text = plain("".join(json.loads(l)[2] for l in lines[1:] if json.loads(l)[1] == "o"))
+    assert "rendered-ok" in text and "canned-day" in text
+
+
+# ------------------------------------------------------------------ mcp
+def test_mcp_tools(tmp_path):
+    pytest.importorskip("mcp")
+    from showrun import mcp_server as m
+
+    assert m.validate_demo(yaml_text="steps: [echo hi]")["ok"]
+    assert not m.validate_demo(yaml_text="steps: [{bogus: 1}]")["ok"]
+    path = tmp_path / "d.yaml"
+    assert m.write_demo(str(path), "steps:\n  - echo from-mcp\n")["ok"]
+    assert not m.write_demo(str(path), "steps: [echo x]")["ok"]  # no silent overwrite
+    res = m.check_demo(path=str(path))
+    assert res["ok"] and res["results"][0]["status"] == "ok"
+    assert "echo from-mcp" in m.export_demo(path=str(path), format="sh")
+    cast = tmp_path / "d.cast"
+    assert m.render_demo(str(cast), path=str(path), delay=0)["ok"]
+    assert "from-mcp" in m.read_cast(str(cast))

@@ -131,6 +131,39 @@ def replay(
 
 
 @app.command()
+def render(
+    demo_file: Path = typer.Argument(..., help="Demo YAML file."),
+    output: Path = typer.Option(..., "--output", "-o", help="The .cast file to write."),
+    var: Optional[List[str]] = VarOpt,
+    offline: bool = typer.Option(False, "--offline", help="Use recorded output instead of running commands."),
+    delay: float = typer.Option(1.0, "--delay", help="Seconds to wait before each Enter."),
+    width: int = typer.Option(100, "--width"),
+    height: int = typer.Option(30, "--height"),
+):
+    """Present a demo unattended and save it as an asciinema .cast (no terminal needed)."""
+    from .render import render_cast
+
+    demo = _load(demo_file, var)
+    r = render_cast(demo, str(output), offline=offline, delay=delay, width=width, height=height)
+    for w in r.warnings:
+        err.print(f"[yellow]{w}[/]")
+    err.print(f"[green]wrote {output}[/] — {r.steps} steps, {r.failures} failed. "
+              f"Play it with: showrun replay {output}")
+    raise typer.Exit(1 if r.failures else 0)
+
+
+@app.command()
+def mcp():
+    """Run an MCP server (stdio) so AI agents can write, check and render demos."""
+    try:
+        from .mcp_server import main
+    except ImportError:
+        err.print("[red]the MCP server needs the `mcp` extra:[/] pip install 'showrun-cli[mcp]' (Python 3.10+)")
+        raise typer.Exit(2)
+    main()
+
+
+@app.command()
 def notes(demo_file: Path = typer.Argument(..., help="The demo being presented.")):
     """Presenter view: run in a second terminal to see the current step, notes and what's next."""
     from .notes import default_notes_path, watch

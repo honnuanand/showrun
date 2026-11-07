@@ -12,7 +12,7 @@ requires-python = ">=3.9"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Anand Rao", email = "anand@clue2solve.com" }]
-keywords = ["demo", "terminal", "presentation", "cli", "asciinema", "live-coding"]
+keywords = ["demo", "terminal", "presentation", "cli", "asciinema", "live-coding", "demo-magic", "mcp"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -34,11 +34,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7", "build", "twine"]
+# MCP server (`showrun mcp`) for AI agents; the MCP SDK needs Python 3.10+.
+mcp = ["mcp>=1.2; python_version >= '3.10'"]
 
 [project.urls]
 Homepage = "https://github.com/honnuanand/showrun"
 Source = "https://github.com/honnuanand/showrun"
 Issues = "https://github.com/honnuanand/showrun/issues"
+Documentation = "https://github.com/honnuanand/showrun/tree/main/docs"
 
 [project.scripts]
 showrun = "showrun.cli:app"

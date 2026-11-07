@@ -62,6 +62,11 @@ class Shell:
         full_env = dict(os.environ)
         full_env.update(env or {})
         full_env.setdefault("TERM", "xterm-256color")
+        # A pager (git log, man, systemctl) would wait for keys the audience never sends.
+        # The demo's own settings.env can still choose a pager.
+        for var in ("PAGER", "GIT_PAGER", "SYSTEMD_PAGER"):
+            if var not in (env or {}):
+                full_env[var] = "cat"
         # Keep users' rc files out of the way; demos should be reproducible.
         full_env["PS1"] = ""
         full_env["PS2"] = ""

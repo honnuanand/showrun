@@ -7,15 +7,16 @@ import shutil
 import sys
 import time
 from pathlib import Path
-from typing import Optional, TextIO
+from typing import Optional, TextIO, Tuple
 
 
 class CastTee:
     """File-like wrapper: writes to the real stream and records an asciinema v2 cast."""
 
-    def __init__(self, stream: TextIO, path: str, title: Optional[str] = None):
+    def __init__(self, stream: TextIO, path: str, title: Optional[str] = None,
+                 size: Optional[Tuple[int, int]] = None):
         self.stream = stream
-        cols, rows = shutil.get_terminal_size((100, 30))
+        cols, rows = size or shutil.get_terminal_size((100, 30))
         self.out = open(path, "w", encoding="utf-8")
         header = {"version": 2, "width": cols, "height": rows,
                   "timestamp": int(time.time()), "env": {"TERM": "xterm-256color"}}
