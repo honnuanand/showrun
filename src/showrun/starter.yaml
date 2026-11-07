@@ -1,0 +1,65 @@
+# showrun demo — press Enter to advance, ? for all keys.
+title: showrun tour
+
+settings:
+  prompt: "[bold green]anand@demo[/] [bold blue]{cwd}[/] [bold]$[/] "
+  typing_speed: 0.035     # seconds per character
+  jitter: 0.5             # human-ish timing
+  typo_rate: 0.015        # the occasional fat-fingered key, corrected live
+
+vars:
+  port: 8765              # override: showrun play demo.yaml -v port=9000
+  workdir: /tmp/showrun-tour
+
+setup:                    # runs silently before the first step
+  - rm -rf {{workdir}} && mkdir -p {{workdir}}
+
+cleanup:                  # always runs, even if you quit with q
+  - rm -rf {{workdir}}
+
+steps:
+  - title: Getting set up
+    say: Every step shares one shell, so cd and export stick.
+    run: cd {{workdir}}
+    notes: Mention that this is a real shell, not a recording.
+
+  - run: export GREETING="hello from showrun"     # shorthand also works: - echo hi
+    hidden: true
+
+  - run: echo "$GREETING"
+    expect_output: hello
+
+  - run: |
+      cat > app.txt <<'EOF'
+      status: ok
+      version: 1.4.2
+      warning: cache is cold
+      EOF
+    type: false            # appears instantly, no typing
+
+  - run: cat app.txt
+    highlight: ["warning.*"]   # draw the audience's eye
+    notes: Point at the highlighted warning line.
+
+  - title: Services
+    run: python3 -m http.server {{port}} --bind 127.0.0.1
+    background: true
+    wait_for: curl -sf http://127.0.0.1:{{port}}/ -o /dev/null
+
+  - run: curl -s http://127.0.0.1:{{port}}/ | grep -m1 -o 'app.txt'
+    expect_output: app.txt
+
+  - title: Safety nets
+    say: Slow or flaky? Show canned output instead of running it.
+    run: kubectl rollout status deploy/web
+    execute: false
+    output: |
+      Waiting for deployment "web" rollout to finish: 2 of 3 updated replicas are available...
+      deployment "web" successfully rolled out
+    highlight: successfully
+
+  - run: ls /does-not-exist
+    expect_exit: any        # failures you meant to show
+
+  - say: That's the tour. Try `showrun record my-demo.yaml` to capture your own.
+    pause: true

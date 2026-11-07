@@ -1,0 +1,22 @@
+title: Recorded demo
+settings:
+  typing_speed: 0.04
+steps:
+- title: Intro
+  say: Let's look around
+  run: mkdir -p /tmp/rec-test && cd /tmp/rec-test
+- run: echo secret > s.txt
+  hidden: true
+- run: ls
+  recorded_output: |
+    s.txt
+- notes: mention the file
+  run: cat s.txt
+  recorded_output: |
+    secret
+- run: 'false'
+  expect_exit: 1
+- run: date
+  execute: false
+  output: |
+    Sat Nov  7 11:49:51 PST 2026
