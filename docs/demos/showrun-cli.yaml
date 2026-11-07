@@ -1,0 +1,21 @@
+# showrun presenting itself: validate, rehearse and export a demo.
+# Present it:  showrun play docs/demos/showrun-cli.yaml
+title: showrun, rehearsed
+
+settings:
+  prompt: "[bold green]you[/] [bold blue]{cwd}[/] [bold]$[/] "
+  typing_speed: 0.03
+  cwd: ../..              # the repo root, relative to this file
+
+steps:
+  - title: Write once, rehearse often
+    say: validate parses the file and lists every step.
+    run: showrun validate examples/tour.yaml
+
+  - say: check runs every step unattended. Exit code 1 on failure, so it works in CI.
+    run: showrun check examples/tour.yaml
+    highlight: ["all good"]
+    expect_output: all good
+
+  - say: export turns the same file into a Markdown runbook for your docs.
+    run: showrun export examples/tour.yaml -f md | head -20

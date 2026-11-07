@@ -1,9 +1,21 @@
 # showrun
 
+[![CI](https://github.com/honnuanand/showrun/actions/workflows/ci.yml/badge.svg)](https://github.com/honnuanand/showrun/actions/workflows/ci.yml)
+[![Publish](https://github.com/honnuanand/showrun/actions/workflows/publish.yml/badge.svg)](https://github.com/honnuanand/showrun/actions/workflows/publish.yml)
+[![PyPI](https://img.shields.io/pypi/v/showrun-cli)](https://pypi.org/p/showrun-cli)
+[![Python](https://img.shields.io/pypi/pyversions/showrun-cli)](https://pypi.org/p/showrun-cli)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/honnuanand/showrun/blob/main/LICENSE)
+
 Scripted, keypress-driven terminal demos. You write (or **record**) the demo once, then
 present it by just hitting **Enter**: commands are typed out like a human would, run in a
 real shell, and stream live output. Hidden setup, canned output, presenter notes, rehearsal,
 offline playback and recordings are built in.
+
+It's made for anyone who shows a command line to other people: conference talks, team demos,
+and especially **how-tos for CLI tools**. Write the steps once, rehearse them in CI, present
+them live, and publish the same file as a replay and a Markdown runbook.
+
+![showrun presenting a short git how-to](https://raw.githubusercontent.com/honnuanand/showrun/main/docs/media/git-undo.gif)
 
 ```bash
 pip install showrun-cli     # the command is `showrun`
@@ -11,6 +23,21 @@ showrun init demo.yaml      # starter demo that shows off every feature
 showrun check demo.yaml     # rehearse unattended
 showrun play demo.yaml      # present it
 ```
+
+## Sample replays
+
+Each of these is a YAML file in this repo, rendered with `showrun render`. The `.cast` files
+play in [asciinema-player](https://github.com/asciinema/asciinema-player) or with
+`showrun replay docs/casts/<name>.cast`.
+
+| Demo | Replay |
+|---|---|
+| **How-to: undo your last git commit** ([`docs/demos/git-undo.yaml`](https://github.com/honnuanand/showrun/blob/main/docs/demos/git-undo.yaml)): narration, highlights, a real git repo set up silently | [GIF](https://raw.githubusercontent.com/honnuanand/showrun/main/docs/media/git-undo.gif) · [cast](https://github.com/honnuanand/showrun/blob/main/docs/casts/git-undo.cast) |
+| **The feature tour** ([`examples/tour.yaml`](https://github.com/honnuanand/showrun/blob/main/examples/tour.yaml)): shared shell state, hidden steps, a background server with `wait_for`, canned output | ![tour](https://raw.githubusercontent.com/honnuanand/showrun/main/docs/media/tour.gif) |
+| **showrun rehearsing itself** ([`docs/demos/showrun-cli.yaml`](https://github.com/honnuanand/showrun/blob/main/docs/demos/showrun-cli.yaml)): `validate`, `check` and `export` | ![showrun cli](https://raw.githubusercontent.com/honnuanand/showrun/main/docs/media/showrun-cli.gif) |
+| **Offline playback** ([`examples/recorded.yaml`](https://github.com/honnuanand/showrun/blob/main/examples/recorded.yaml) with `--offline`): recorded output, nothing executed | ![offline](https://raw.githubusercontent.com/honnuanand/showrun/main/docs/media/offline.gif) |
+
+The full guide, with every option and workflow, is in [docs/](https://github.com/honnuanand/showrun/blob/main/docs/README.md).
 
 ## Commands
 
@@ -20,9 +47,11 @@ showrun play demo.yaml      # present it
 | `showrun record demo.yaml` | Do the demo once in a shell; every command and its output becomes a step |
 | `showrun check demo.yaml` | Rehearsal: runs every step, checks exit codes and expected output, flags slow steps. Exit code 1 on failure, so it works in CI |
 | `showrun notes demo.yaml` | Presenter view for a second terminal: current step, talking points, what's next, timer |
+| `showrun render demo.yaml -o demo.cast` | Present unattended and save an asciinema cast, no terminal needed (`--offline`, `--delay 1.5`, `--width`, `--height`). Good for docs and CI |
 | `showrun replay talk.cast` | Play back a recording (`--speed 2 --max-idle 1`). Casts also work with asciinema / asciinema-player |
 | `showrun export demo.yaml -f md` | Markdown runbook (`-f sh` for a plain bash script) |
 | `showrun validate demo.yaml` | Parse and list steps |
+| `showrun mcp` | MCP server for AI agents (see below) |
 
 ## Keys while presenting
 
@@ -126,6 +155,46 @@ steps:
 
 Full-screen apps (vim, top, k9s) don't stream well inside a step. Use `i` to drop into the
 live shell for those. Commands that read from stdin need their input piped in.
+
+## Use it from AI agents (MCP)
+
+`showrun mcp` runs a [Model Context Protocol](https://modelcontextprotocol.io) server over
+stdio, so an agent such as Claude Code, Claude Desktop or Cursor can write, rehearse and
+render demos for you.
+
+```bash
+pip install 'showrun-cli[mcp]'                 # needs Python 3.10+
+claude mcp add showrun -- showrun mcp          # Claude Code
+```
+
+For other clients, add it to the client's MCP config:
+
+```json
+{ "mcpServers": { "showrun": { "command": "showrun", "args": ["mcp"] } } }
+```
+
+| Tool | What it does |
+|---|---|
+| `demo_format`, `starter_demo` | The YAML format reference and a starter file to edit |
+| `validate_demo` | Parse a demo (file or inline YAML) and list its steps |
+| `write_demo` | Validate and save a demo; won't overwrite unless asked |
+| `check_demo` | Rehearse: **runs** every command and reports failures |
+| `export_demo` | Markdown runbook or bash script |
+| `render_demo` | Present unattended into a `.cast` (**runs** commands unless `offline`) |
+| `read_cast` | A `.cast` as plain text with step markers, so the agent can see the result |
+
+The server also publishes the one-page guide as the resource `showrun://guide`. Ask your
+agent something like *"write a showrun demo that shows how to use `jq` to filter JSON,
+check it, and render it"*. `check_demo` and `render_demo` run shell commands on your
+machine, so leave your client's tool approval on.
+
+## Credits
+
+showrun is inspired by [demo-magic](https://github.com/paxtonhare/demo-magic) by Paxton
+Hare, the little bash script that types your commands for you while you talk. I've used
+demo-magic for my own talks and demos for more than a decade, and showrun is my attempt at
+the same idea with rehearsal, recording, offline playback and presenter notes built in.
+Thank you, Paxton.
 
 ## Development
 
