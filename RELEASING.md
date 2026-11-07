@@ -5,11 +5,11 @@ stored anywhere.
 
 ## One-time setup
 
-1. Push this repo to GitHub (the URLs in `pyproject.toml` assume `clue2solve/showrun`;
+1. Push this repo to GitHub (the URLs in `pyproject.toml` point at `honnuanand/showrun`;
    change them if you use a different repo).
 2. On PyPI, go to **Your account → Publishing → Add a new pending publisher**:
    - PyPI project name: `showrun-cli`
-   - Owner: `clue2solve`, Repository: `showrun`
+   - Owner: `honnuanand`, Repository: `showrun`
    - Workflow name: `publish.yml`, Environment: `pypi`
 3. Do the same on https://test.pypi.org with environment `testpypi` (optional, but
    useful for a dry run).

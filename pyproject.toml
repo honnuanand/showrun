@@ -36,9 +36,9 @@ dependencies = [
 dev = ["pytest>=7", "build", "twine"]
 
 [project.urls]
-Homepage = "https://github.com/clue2solve/showrun"
-Source = "https://github.com/clue2solve/showrun"
-Issues = "https://github.com/clue2solve/showrun/issues"
+Homepage = "https://github.com/honnuanand/showrun"
+Source = "https://github.com/honnuanand/showrun"
+Issues = "https://github.com/honnuanand/showrun/issues"
 
 [project.scripts]
 showrun = "showrun.cli:app"
