@@ -39,7 +39,7 @@ def render_cast(demo: Demo, path: str, *, offline: bool = False, delay: float = 
 
     Typing, typos and output timing are real, so the cast looks like a live presentation.
     """
-    tee = CastTee(_Sink(), path, demo.title, size=(width, height))
+    tee = CastTee(_Sink(), path, demo.title, size=(width, height), crlf=True)
     console = Console(file=tee, force_terminal=True, color_system="truecolor", highlight=False,
                       width=width, height=height)
     player = Player(demo, console=console, keys=AutoKeys(delay), offline=offline,

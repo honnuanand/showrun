@@ -206,6 +206,7 @@ def test_render_cast_headless(tmp_path):
     assert json.loads(lines[0])["width"] == 80
     text = plain("".join(json.loads(l)[2] for l in lines[1:] if json.loads(l)[1] == "o"))
     assert "rendered-ok" in text and "canned-day" in text
+    assert re.search(r"(?<!\r)\n", "".join(json.loads(l)[2] for l in lines[1:])) is None  # CRLF only
 
 
 # ------------------------------------------------------------------ mcp

@@ -3,19 +3,23 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import sys
 import time
 from pathlib import Path
 from typing import Optional, TextIO, Tuple
 
+_LONE_LF = re.compile(r"(?<!\r)\n")
+
 
 class CastTee:
     """File-like wrapper: writes to the real stream and records an asciinema v2 cast."""
 
     def __init__(self, stream: TextIO, path: str, title: Optional[str] = None,
-                 size: Optional[Tuple[int, int]] = None):
+                 size: Optional[Tuple[int, int]] = None, crlf: bool = False):
         self.stream = stream
+        self.crlf = crlf  # no tty to turn "\n" into "\r\n", so do it here (headless renders)
         cols, rows = size or shutil.get_terminal_size((100, 30))
         self.out = open(path, "w", encoding="utf-8")
         header = {"version": 2, "width": cols, "height": rows,
@@ -27,7 +31,8 @@ class CastTee:
 
     def write(self, data: str) -> int:
         if data:
-            self.out.write(json.dumps([round(time.monotonic() - self.start, 6), "o", data]) + "\n")
+            rec = _LONE_LF.sub("\r\n", data) if self.crlf else data
+            self.out.write(json.dumps([round(time.monotonic() - self.start, 6), "o", rec]) + "\n")
         return self.stream.write(data)
 
     def marker(self, label: str) -> None:
